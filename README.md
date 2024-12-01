@@ -51,21 +51,34 @@ This project provides a flexible and reusable query generator based on a pre-def
 
 ## Example
 
-To generate a query for the `Referrer` schema with the column `Referrer ID`, simply adjust the `selectColumns` array in `index.ts`:
+To generate a query for the `Referrer` schema with multiple columns and filters, set up the `selectColumns` and `filters` in `index.ts`:
 
 ```javascript
 const schemaName = 'Referrer';
-const selectColumns = ['Referrer ID'];
-const filters = {};
+const selectColumns = [
+  'Referrer ID',
+  'Referrer name',
+  'Referrer organization name',
+  'Spam',
+];
+
+const filters = { 'user.id': 1 };
 
 const query = generateQuery(schemaName, selectColumns, filters);
 console.log(query);
 ```
 
-This will generate a simple query without any joins or filters:
+This will generate a query with the selected columns and a `WHERE` clause:
 
 ```sql
-SELECT id AS "Referrer ID" FROM user
+SELECT id AS "Referrer ID", 
+       COALESCE(first_name, '') || ' ' || COALESCE(last_name, '') AS "Referrer name", 
+       organization.name AS "Referrer organization name", 
+       SUM(CASE WHEN "lead.intro_spam_status" = 'relation_not_validated' OR "lead.intro_spam_status" = 'no_reply' THEN 1 ELSE 0 END) AS "Spam"
+FROM user
+LEFT JOIN organization AS organization ON user.organization_id = organization.id
+LEFT JOIN lead AS lead ON lead.referrer_id = user.id
+WHERE user.id = 1
 ```
 
 ## Contribution
