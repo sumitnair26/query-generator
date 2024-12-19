@@ -19,7 +19,7 @@ This project provides a flexible and reusable query generator based on a pre-def
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/query-generator.git
+   git clone https://github.com/sumitnair26/query-generator
    cd query-generator
    ```
 
